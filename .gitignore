@@ -1,0 +1,44 @@
+# ============================================================
+# STM32CubeIDE .gitignore
+# Intentionally keeps CMSIS, HAL driver source, startup files,
+# and .ioc config — these are committed on purpose to document
+# what CubeMX/CubeIDE auto-generates (see project 01 vs 03).
+# Only build output and local IDE/workspace noise is excluded.
+# ============================================================
+
+# --- Build output ---
+Debug/
+Release/
+build/
+*.o
+*.obj
+*.elf
+*.bin
+*.hex
+*.map
+*.list
+*.su
+*.d
+*.i
+*.lst
+
+# --- STM32CubeIDE workspace / project-local metadata ---
+# .cproject and .project are usually fine to keep (they define
+# the CDT project itself), but .settings can contain local
+# machine-specific paths — safe to ignore.
+.settings/
+*.launch
+.metadata/
+.cproject
+.project
+
+# --- STM32CubeMX backup/log noise ---
+*.ioc.bak
+*_HAL_settings.txt
+*.mxproject
+
+# --- OS / editor junk ---
+.DS_Store
+Thumbs.db
+*.swp
+*~

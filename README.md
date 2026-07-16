@@ -1,0 +1,1 @@
+Learning embedded systems on an ARM cortex-M0 microcontroller (STM32F030R8). Welcome to my playground, enjoy!
