@@ -22,8 +22,41 @@
   #warning "FPU is not initialized, but the project is compiling for an FPU. Please initialize the FPU before use."
 #endif
 
+
+/* ---- Register address definitions (manually derived from RM0091) ---- */
+#define RCC_BASE 0x40021000UL
+#define AHBENR_OFFSET 0x14UL
+#define RCC_AHBENR (*(volatile uint32_t *)(RCC_BASE + AHBENR_OFFSET)) /* 0x40021014 */
+#define RCC_AHBENR_GPIOAEN (1U << 17)
+
+#define GPIOA_BASE 0x48000000UL
+#define MODER_OFFSET 0x00UL
+#define BSRR_OFFSET 0x18UL
+#define GPIOA_MODER (*(volatile uint32_t *)(GPIOA_BASE + MODER_OFFSET))
+#define GPIOA_BSRR (*(volatile uint32_t *)(GPIOA_BASE + BSRR_OFFSET))
+
+
 int main(void)
 {
+	// Enable GPIOA clock gate by setting the IOPAEN bit high (17th bit of RCC_AHBENR register)
+	RCC_AHBENR |= RCC_AHBENR_GPIOAEN;
+
+	// Configure GPIOA PA5 (The exact pin for LED) in "general purpose output mode"
+	GPIOA_MODER &= ~((1U << 10) | (1U << 11)); /* clear the bits by setting them "0" */
+	GPIOA_MODER |= (1U << 10); /* Configure the pin as output (01) */
+
     /* Loop forever */
-	for(;;);
+	for(;;){
+		// Set PA5 pin high
+		GPIOA_BSRR = (1U << 5);
+
+		// crude busy-wait delay, duration depends on clock speed
+		for(volatile uint32_t i = 0; i < 200000; i++);
+
+		// Set PA5 pin low
+		GPIOA_BSRR = (1U << (5 + 16)); /* Register's first 16 bit -> set, last 16 bit -> reset*/
+
+		// crude busy-wait delay, duration depends on clock speed
+		for(volatile uint32_t i = 0; i < 200000; i++);
+	}
 }
