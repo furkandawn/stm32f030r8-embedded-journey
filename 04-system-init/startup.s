@@ -73,8 +73,8 @@
 .type Reset_Handler, %function
 Reset_Handler:
     /* Initialize the MSP, redundant in cortex-M0 since this is done by hardware automatically*/
-    ldr r0, =_estack
-    mov sp, r0
+    //ldr r0, =_estack
+    //mov sp, r0
 
     /* branch to MCU specific hardware initialization */
     bl SystemInit
