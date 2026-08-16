@@ -1,0 +1,1 @@
+void gpio_led_init(void);
