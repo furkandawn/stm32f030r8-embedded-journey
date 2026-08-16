@@ -56,7 +56,7 @@ void SystemCoreClockUpdate(void)
             break;
     }
 
-    /* decode and apply AHB Prescaler before SYSCLK reaches CPU */
+    /* decode and apply AHB Prescaler SYSCLK -> HCLK */
     SystemCoreClock >>= AHBPrescTable[((RCC->CFGR & RCC_CFGR_HPRE) >> 4)];
 }
 
@@ -119,4 +119,14 @@ void ClockSwitchToHSI(void)
     while (RCC->CR & RCC_CR_PLLRDY);
 
     SystemCoreClockUpdate();
+}
+
+uint32_t ClockGetHCLK(void)
+{
+    return SystemCoreClock;
+}
+
+uint32_t ClockGetPCLK(void)
+{
+    return SystemCoreClock >> APBPrescTable[((RCC->CFGR & RCC_CFGR_PPRE) >> 8)];
 }
