@@ -13,15 +13,15 @@ Clicking "Build" almost feels magical. A few seconds later an executable appears
 - Most of the building process is completely hidden behind the IDE (to be fair, that's what they are for).
 
 ### 1st Step: The Build Process
-![Build Process](../assets/build_process.png)
+![Build Process](../assets/03/build_process.png)
 
 - CPU only understands one thing: machine instruction. These instructions appear to be in binary format. The compiler, assembler and the linker all work together to translate our source files into an instruction stream (0s and 1s). This stream is then fetched by the CPU from FLASH memory. In order to create these machine instructions, we first need to "build" our source files.
 
 - Building Process consists of compiling and linking stages:
 
-![Compiling Process](../assets/compiling_process.png)
+![Compiling Process](../assets/03/compiling_process.png)
 
-![Linking Process](../assets/linking_process.png)
+![Linking Process](../assets/03/linking_process.png)
 
 The IDE automates the following steps in the previous figures:
 1) Preprocess the C source files (.c -> .i)
@@ -53,7 +53,7 @@ Here is a breakdown of each file generated during build process:
 - Human readable text file generated during linking process for feedback. It displays the system memory usage and each component address, the map.
 
 ## 2nd Step: What Happens on Reset/Power-up?
-![Reset/Power-Up Diagram](../assets/powerup_diagram.png)
+![Reset/Power-Up Diagram](../assets/03/powerup_diagram.png)
 
 - There is not much happening actually, barely enough to prepare the environment and wake up the system.
 
@@ -69,7 +69,7 @@ Here is a breakdown of each file generated during build process:
 - After setting the .data section, it sets all the bits in the .bss section to "0".
 - And lastly, it branches to (jumps to) main().
 
-![Copying .data section](../assets/data_copy_loop.png)
+![Copying .data section](../assets/03/data_copy_loop.png)
 - the copy loop is inside the startup.s file, Reset_Handler.
 
 ## But How does it happen?
@@ -81,17 +81,17 @@ Embedded systems generally have two different memory types. FLASH memory and RAM
 ### FLASH Memory
 The target device's FLASH memory start address and the size is known in the Reference Manual.
 
-![Flash Memory Organization](../assets/flash_memory_organization.png)
+![Flash Memory Organization](../assets/03/flash_memory_organization.png)
 
 - Our flash starts at the address 0x0800 0000, ends at 0x0800 FFFF. Size is 64K.
 
 ### The Segments of Flash Memory
-![Flash Memory Segments](../assets/flash_memory_segments.png)
+![Flash Memory Segments](../assets/03/flash_memory_segments.png)
 
 #### The vector table
 - Lives at the bottom of the FLASH memory. It is the very first entry and it HAS to be. The vector table itself is the main starting point of the boot process.
 
-![Vector Table](../assets/vector_table.png)
+![Vector Table](../assets/03/vector_table.png)
 
 #### .text
 - The place where machine code instructions live. The CPU fetches instructions from the .text section. The PC (Program Counter) always holds the address of the next instruction to execute.
@@ -117,7 +117,7 @@ uint8_t counter = 42;
 The RAM is the memory unit that is being used to manipulate data on runtime. The machine instruction code actually does not live on RAM on our cortex-M0 brain. It is because the processor uses Harvard architecture system, in this particular system the CPU fetches the instructions directly from FLASH. Saving precious RAM memory.
 
 ### RAM Segments
-![RAM Segments](../assets/ram_segments.png)
+![RAM Segments](../assets/03/ram_segments.png)
 
 #### .data
 - This segment where our initialized variables live, they are copied directly from FLASH memory's ".data" segment. The copying process is done on reset/power-up by the Reset_Handler.
@@ -159,21 +159,21 @@ The RAM is the memory unit that is being used to manipulate data on runtime. The
 - Makefiles automate the entering command process. instead of writing "arm-none-eabi-gcc -c..." every time to compile source files, you write your Makefile once and run the command "make" and it automatically runs the commands. Makefiles automate rule-based compilation pipelines.
 
 ### The Compilation, Linking and Flashing process:
-![Make Command](../assets/make_command.png)
-![Flashing The Microcontroller](../assets/make_flashing.png)
+![Make Command](../assets/03/make_command.png)
+![Flashing The Microcontroller](../assets/03/make_flashing.png)
 
 - With the help of the cross-compiler tools I managed to build, link and flash the microcontroller.
 
 ### OpenOCD
 - *(Open On-Chip Debugger):* Server software that translates GDB commands into hardware-level JTAG/SWD protocol commands.
 
-![OpenOCD Debugging on Terminal](../assets/openocd_init.png)
+![OpenOCD Debugging on Terminal](../assets/03/openocd_init.png)
 - Initializing OpenOCD and connecting to target device
 
-![GDB Initialization](../assets/gdb_init.png)
+![GDB Initialization](../assets/03/gdb_init.png)
 - Initializing GDB
 
-![OpenOCD Port Connection](../assets/gdb_listen_port.png)
+![OpenOCD Port Connection](../assets/03/gdb_listen_port.png)
 - Listening the target device on port 3333
 
 - In the figures above you can see me initializing openocd on my terminal to investigate the RAM contents, don't forget to check the RAM section under "The Binary Truth" header.
@@ -182,7 +182,7 @@ The RAM is the memory unit that is being used to manipulate data on runtime. The
 - Physical hardware programmer/debugger interface, I honestly don't know much about it YET.
 
 ## The Binary Truth
-![Flash Memory Hex Dump](../assets/bin_hex_dump1.png)
+![Flash Memory Hex Dump](../assets/03/bin_hex_dump1.png)
 
  - In this figure you can see the contents of the .elf file, the very beginning of it. The left column is the address, and each row contains 4 words, each word is in *little-endian* format.
 
@@ -217,7 +217,7 @@ int main(void)
 
 - Looking the at the following sections inside FLASH, one expects to see the *.data* and the *.rodata* sections, right? Have a look.
 
-![Flash Memory Hex Dump](../assets/bin_hex_dump2.png)
+![Flash Memory Hex Dump](../assets/03/bin_hex_dump2.png)
 
 - Contents of section .data: address 0x2000 0000, value 0x0000 000a (10 in decimal).
 
@@ -229,7 +229,7 @@ int main(void)
 
 - I set a temporary breakpoint at the very start of our program so I could walk through every execution starting from the Reset_Handler() function. Let me show you some debug visuals from the GDB commands:
 
-![GDB Memory Sections](../assets/gdb_memory_sections.png)
+![GDB Memory Sections](../assets/03/gdb_memory_sections.png)
 
 - It shows the address of the start of .data section in RAM (_sdata), and end of .data (_edata)
 - You can see _sidata address 0x0800 01a8, this is where our .data values in FLASH memory lives. The LMA address itself mentioned earlier.
@@ -237,21 +237,21 @@ int main(void)
 - and .bss section allocates 256 bytes of RAM, as it is needed for the uninitialized 64 entry uint32_t array.
 
 #### The garbage values in RAM
-![RAM Garbage Values](../assets/gdb_bss_garbage.png)
+![RAM Garbage Values](../assets/03/gdb_bss_garbage.png)
 
 - When our board is powered up, the very first snapshot of our RAM looks like this. Garbage value everywhere. Just a few milliseconds later, the MSP is set and the Reset_Handler is called. Then it looks like this:
 
-![RAM on Reset](../assets/gdb_debug_info1.png)
+![RAM on Reset](../assets/03/gdb_debug_info1.png)
 
 - This is the snapshot of our RAM just before entering the main() function. Remember our code, I incremented the initialized variable and set the 0 index of our uninitialized array to 1. So let's check if that really happened.
 
-![RAM on Main](../assets/gdb_debug_info2.png)
+![RAM on Main](../assets/03/gdb_debug_info2.png)
 
 - This is not magic, just Reset_Handler doing it's job. Its last job was to branch to main, and it did. It appears so.
 
 ### The ARM Thumb Instruction Set Reality
 
-![PC Real Value](../assets/gdb_monitor_reset.png)
+![PC Real Value](../assets/03/gdb_monitor_reset.png)
 
 - Remember when we did Hex Dump? The second entry of the vector table was "0x0800 0159", but our actual PC is "0x0800 0158". On ARM Cortex-M processors, the LSB of every function address is not part of the actual memory address. Instead, the LSB is used as a flag telling the processor "execute this in Thumb state". It appears Cortex-M processors only support Thumb instructions, so this bit is set to 1 all the time. The processor loads the address into to PC, ignores the LSB, and begins executing at the actual address.
 
