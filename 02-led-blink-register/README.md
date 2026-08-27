@@ -72,7 +72,7 @@ Don't be scared, I'll walk you through every line as we uncover the underlying t
 A register is simply a small storage location to stash bits. Each bit controls a specific hardware feature. It's built with transistors (flip-flops or latches) in pure silicon. Everything comes down to silicon in this world. We use these fancy friends (registers) to manipulate this silicon world. When this chip was manufactured, every single register was assigned to a **specific address** (a magical number like 0x40021000). Let's look at the system architecture first.
 
 ### System Architecture
-![System Architecture](../assets/system_architecture.png)
+![System Architecture](../assets/02/system_architecture.png)
 
 I highlighted the subsystems which our code touched. We don't need to understand everything right now as we only blink an LED which is connected to the GPIOA port 5.
 
@@ -85,17 +85,17 @@ I highlighted the subsystems which our code touched. We don't need to understand
 If we want to blink this LED, we first need to enable the GPIO clock on its way. But, how do we find the exact address of this gate? Well, here comes the reference manual RM0091.
 
 - This is a general overview of the memory addresses in our chip.
-![Memory Map](../assets/memory_map.png)
+![Memory Map](../assets/02/memory_map.png)
 
 - I marked the much-needed sections in cute little red boxes. All we need to do is to access RCC over AHB1, and GPIOA over AHB2. Simple as that.
 
-![RCC and GPIOA Addresses](../assets/memory_map_ahb.png)
+![RCC and GPIOA Addresses](../assets/02/memory_map_ahb.png)
 - Now we know the exact memory addresses (register addresses) of RCC and GPIOA. But we need to continue even further to know which exact pinpoint address (register) we need to manipulate...
 
 ### Enabling The Clock Gate
 - It's not magic anymore. It's pure address numbers.
 
-![RCC_AHBENR](../assets/RCC_AHBENR.png)
+![RCC_AHBENR](../assets/02/RCC_AHBENR.png)
 
 - We now know that, the offset is "0x14". Which basically means we need to add this offset to the base address of RCC --which was 0x4002 1000, check the previous figure. So, if we try to manipulate the exact "0x4002 1014" hex address, we touch the RCC_AHBENR register. AHBENR (AHB enable register). This is the locked clock gate I mentioned just a section earlier.
 
@@ -118,11 +118,11 @@ If we want to blink this LED, we first need to enable the GPIO clock on its way.
 ### Setting The Port
 - Now that we enabled the GPIO clock that connects our cute pin to the whole bus matrix, we must configure it. In order to do that, I looked into the reference manual and found a schematic that sums up how an IO port pin works.
 
-![IO_PORT_PIN](../assets/IO_port_pin.png)
+![IO_PORT_PIN](../assets/02/IO_port_pin.png)
 
 - We'll only be using the bottom output section, to achieve such state we need to manipulate the GPIOx_MODER register. It's designed for this exact purpose. Here's the layout of GPIOx_MODER register.
 
-![GPIOx_MODER](../assets/GPIOx_MODER.png)
+![GPIOx_MODER](../assets/02/GPIOx_MODER.png)
 
 - To obtain the address of GPIOx_MODER register, we use (GPIOA base address + specific register offset). Which is, (0x48000000UL + 0x00UL).
 - We configured our PA5 pin (the LED), MODER5 in this case, by setting the 10th bit as "1" and 11th bit as "0" in our main.c file. It is the general purpose output mode as shown in the figure.
@@ -138,7 +138,7 @@ If we want to blink this LED, we first need to enable the GPIO clock on its way.
 ### GPIOx_BSRR Register
 - There are two different registers to manipulate the data of a pin, we are going to use the more efficient one for our task. I'll explain the difference later under this section. The one register we will use is the BSRR register. It's a write only register, meaning we can't read from this register and only write to it.
 
-![GPIOx_BSRR](../assets/GPIOx_BSRR.png)
+![GPIOx_BSRR](../assets/02/GPIOx_BSRR.png)
 
 - To reach the address of this register, we do the same thing we always have done. GPIOA base address + register offset. 0x48000018UL is the address of this register.
 
